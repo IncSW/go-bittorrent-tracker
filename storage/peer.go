@@ -2,9 +2,14 @@ package storage
 
 import (
 	"encoding/binary"
+	"errors"
 	"time"
 )
 
+// ErrInvalidPeerData is the error returned when invalid peer data provided.
+var ErrInvalidPeerData = errors.New("storage: invalid peer data")
+
+// Peer info struct
 type Peer struct {
 	ID         []byte // 20 bytes
 	Uploaded   uint64
@@ -16,6 +21,7 @@ type Peer struct {
 	LastUpdate time.Time
 }
 
+// Marshal marshals a Peer to a byte slice
 func (p *Peer) Marshal() []byte {
 	data := make([]byte, 58+len(p.Key))
 	copy(data, p.ID[:20])
@@ -30,9 +36,10 @@ func (p *Peer) Marshal() []byte {
 	return data
 }
 
+// Unmarshal unmarshals data to a Peer.
 func (p *Peer) Unmarshal(data []byte) error {
 	if len(data) < 58 {
-		return ErrInvalidInfoData
+		return ErrInvalidPeerData
 	}
 
 	p.ID = data[:20]

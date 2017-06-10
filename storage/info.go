@@ -1,7 +1,14 @@
 package storage
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"errors"
+)
 
+// ErrInvalidInfoData is the error returned when invalid info data provided.
+var ErrInvalidInfoData = errors.New("storage: invalid info data")
+
+// Info torrent info struct
 type Info struct {
 	Hash       []byte // 20 bytes
 	Incomplete uint32
@@ -10,6 +17,7 @@ type Info struct {
 	Name       []byte
 }
 
+// Marshal marshals a torrent Info to a byte slice
 func (i *Info) Marshal() []byte {
 	data := make([]byte, 32+len(i.Name))
 	copy(data, i.Hash[:20])
@@ -21,6 +29,7 @@ func (i *Info) Marshal() []byte {
 	return data
 }
 
+// Unmarshal unmarshals data to a torrent Info.
 func (i *Info) Unmarshal(data []byte) error {
 	if len(data) < 32 {
 		return ErrInvalidInfoData
